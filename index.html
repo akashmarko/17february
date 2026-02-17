@@ -1,0 +1,232 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="UTF-8" />
+    <title>For Akansha ❤️</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      rel="stylesheet"
+    />
+
+    <style>
+      body {
+        margin: 0;
+        background: black;
+        overflow: hidden;
+        font-family: sans-serif;
+      }
+
+      /* tap screen */
+      #startScreen {
+        position: fixed;
+        width: 100%;
+        height: 100%;
+        background: black;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: white;
+        font-size: clamp(18px, 5vw, 28px);
+        text-align: center;
+        z-index: 10;
+        cursor: pointer;
+        padding: 20px;
+      }
+
+      /* fade animation */
+      .fadeIn {
+        animation: fade 2s ease forwards;
+      }
+
+      @keyframes fade {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
+
+      canvas {
+        position: absolute;
+        top: 0;
+        left: 0;
+        display: none;
+        z-index: 1;
+      }
+
+      /* ❤️ TEXT */
+      /* container for image + text */
+      #content {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        text-align: center;
+        z-index: 2;
+        width: 100%;
+        padding: 0 20px;
+      }
+
+      /* image */
+      .img {
+        width: clamp(90px, 28vw, 140px);
+        margin-bottom: 18px; /* controls space */
+        opacity: 0;
+      }
+
+      /* text */
+      .text {
+        color: #fff;
+        font-size: clamp(16px, 4.5vw, 26px);
+        font-weight: bold;
+        line-height: 1.6;
+        opacity: 0;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- ❤️ START SCREEN -->
+    <div id="startScreen" style="font-weight: bold">
+      <pre>Akansha, tap to begin ❤️</pre>
+    </div>
+
+    <!-- ❤️ MUSIC -->
+    <audio id="bgMusic" loop>
+      <source src="I_Wanna_Be_Yours.mp3" type="audio/mpeg" />
+    </audio>
+
+    <div id="content">
+      <img src="love.png" class="img" id="loveImg" />
+
+      <div class="text" id="loveText">
+        <!-- <pre>
+            Today feels special… it’s 17 February — the day we first met.
+            Since that day, you’ve quietly become important to me, more than I ever said out loud.
+
+            And maybe that’s why it hurts me to know I made you feel overlooked.
+            I’m truly sorry, Miss Akansha.
+
+            The truth is, you hold a very special place in my heart.
+            Please give me one chance… I want to love you in a way that you feel it every day.
+        </pre> -->
+        Today feels special… it’s 17 February — the day we first met.<br />
+        Since that day, you’ve quietly become important to me, more than I ever
+        said out loud.<br /><br />
+        And maybe that’s why it hurts me to know I made you feel overlooked.<br />
+        I’m truly sorry, Miss Akansha.<br /><br />
+        The truth is, you hold a very special place in my heart.<br />
+        Please give me one chance… I want to love you in a way that you feel it
+        every day.
+      </div>
+    </div>
+
+    <canvas id="c"></canvas>
+
+    <script>
+      const startScreen = document.getElementById("startScreen");
+      const canvas = document.getElementById("c");
+      const ctx = canvas.getContext("2d");
+      const music = document.getElementById("bgMusic");
+      const text = document.getElementById("loveText");
+      const img = document.getElementById("loveImg");
+
+      /* start experience */
+      startScreen.addEventListener("click", () => {
+        startScreen.style.display = "none";
+
+        canvas.style.display = "block";
+        img.style.opacity = "1";
+        text.style.opacity = "1";
+
+        img.classList.add("fadeIn");
+        text.classList.add("fadeIn");
+
+        music.volume = 0.4;
+        music.play();
+      });
+
+      /* canvas resize */
+      function resize() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+      }
+      resize();
+      window.onresize = resize;
+
+      /* colors */
+      const colors = ["#ffb6c1", "#ffc0cb", "#ff8da1", "#ff6f91", "#ff4d6d"];
+
+      const hearts = [];
+      const TOTAL = 140;
+
+      /* create hearts */
+      for (let i = 0; i < TOTAL; i++) {
+        hearts.push({
+          x: Math.random() * canvas.width,
+          y: canvas.height + Math.random() * 80,
+          size: Math.random() * 10 + 6,
+          speed: Math.random() * 0.7 + 0.3,
+          alpha: 0,
+          fade: Math.random() * 0.02 + 0.01,
+          color: colors[Math.floor(Math.random() * colors.length)],
+        });
+      }
+
+      /* draw heart */
+      function drawHeart(h) {
+        ctx.globalAlpha = h.alpha;
+        ctx.fillStyle = h.color;
+
+        ctx.beginPath();
+        ctx.moveTo(h.x, h.y);
+
+        ctx.bezierCurveTo(
+          h.x + h.size,
+          h.y - h.size,
+          h.x + h.size * 2,
+          h.y + h.size / 2,
+          h.x,
+          h.y + h.size * 2,
+        );
+
+        ctx.bezierCurveTo(
+          h.x - h.size * 2,
+          h.y + h.size / 2,
+          h.x - h.size,
+          h.y - h.size,
+          h.x,
+          h.y,
+        );
+
+        ctx.fill();
+        ctx.globalAlpha = 1;
+      }
+
+      /* animation */
+      function animate() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+        hearts.forEach((h) => {
+          h.y -= h.speed;
+
+          if (h.alpha < 0.85) {
+            h.alpha += h.fade;
+          }
+
+          if (h.y < -20) {
+            h.y = canvas.height + 20;
+            h.x = Math.random() * canvas.width;
+            h.alpha = 0;
+          }
+
+          drawHeart(h);
+        });
+
+        requestAnimationFrame(animate);
+      }
+
+      animate();
+    </script>
+  </body>
+</html>
